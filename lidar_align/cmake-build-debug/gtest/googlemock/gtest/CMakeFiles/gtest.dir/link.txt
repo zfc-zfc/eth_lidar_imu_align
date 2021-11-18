@@ -1,0 +1,1 @@
+/usr/bin/c++ -fPIC -g -shared -Wl,-soname,libgtest.so -o libgtest.so CMakeFiles/gtest.dir/src/gtest-all.cc.o   -L/home/dji/workspace/eth_lidar_align_ws/src/lidar_align/cmake-build-debug/gtest/googlemock/gtest/src  -Wl,-rpath,/home/dji/workspace/eth_lidar_align_ws/src/lidar_align/cmake-build-debug/gtest/googlemock/gtest/src -lpthread 

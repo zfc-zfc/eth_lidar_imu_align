@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/dji/workspace/eth_lidar_align_ws/src/lidar_align/cmake-build-debug/devel/setup.sh

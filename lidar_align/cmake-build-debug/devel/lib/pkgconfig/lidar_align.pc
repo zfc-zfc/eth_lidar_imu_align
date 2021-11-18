@@ -1,0 +1,8 @@
+prefix=/home/dji/workspace/eth_lidar_align_ws/src/lidar_align/cmake-build-debug/devel
+
+Name: lidar_align
+Description: Description of lidar_align
+Version: 0.0.0
+Cflags: -I/home/dji/workspace/eth_lidar_align_ws/src/lidar_align/include/
+Libs: -L${prefix}/lib -llidar_align
+Requires: 
