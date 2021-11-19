@@ -20,7 +20,7 @@ void Loader::parsePointcloudMsg(const sensor_msgs::PointCloud2 msg,
   bool has_timing = false;
   bool has_intensity = false;
   for (const sensor_msgs::PointField& field : msg.fields) {
-    if (field.name == "time_offset_us") {
+    if (field.name == "time_offset_us") {   //需要名为time_offset_us，单位为微秒的field.
       has_timing = true;
     } else if (field.name == "intensity") {
       has_intensity = true;
@@ -70,6 +70,60 @@ void Loader::parsePointcloudMsg(const sensor_msgs::PointCloud2 msg,
   }
 }
 
+void parsePointcloudMsg_ouster(const sensor_msgs::PointCloud2 msg,
+                               LoaderPointcloud* pointcloud){
+    bool has_timing = false;
+    bool has_intensity = false;
+    for (const sensor_msgs::PointField& field : msg.fields) {
+        if (field.name == "t") {   //需要名为t，单位为微秒的field.
+            has_timing = true;
+        } else if (field.name == "intensity") {
+            has_intensity = true;
+        }
+    }
+
+    if(has_timing && has_intensity){
+        pcl::PointCloud<Ouster_Point> raw_pointcloud;
+        pcl::fromROSMsg(msg, raw_pointcloud);
+
+        for (const Ouster_Point& raw_point : raw_pointcloud) {
+            PointAllFields point;
+            point.x = raw_point.x;
+            point.y = raw_point.y;
+            point.z = raw_point.z;
+            point.intensity = raw_point.intensity;
+            point.time_offset_us = raw_point.t / 1e3;   //ns to us
+            point.ring = raw_point.ring;
+
+            if (!std::isfinite(point.x) || !std::isfinite(point.y) || !std::isfinite(point.z) ||
+                !std::isfinite(point.intensity) || !std::isfinite(point.time_offset_us)) {
+                continue;
+            }
+            pointcloud->push_back(point);
+        }
+        pointcloud->header = raw_pointcloud.header;
+        return;
+    }else{
+        pcl::PointCloud<pcl::PointXYZ> raw_pointcloud;
+        pcl::fromROSMsg(msg, raw_pointcloud);
+
+        for (const pcl::PointXYZ& raw_point : raw_pointcloud) {
+            PointAllFields point;
+            point.x = raw_point.x;
+            point.y = raw_point.y;
+            point.z = raw_point.z;
+            if (!std::isfinite(point.x) || !std::isfinite(point.y) ||
+                !std::isfinite(point.z)) {
+                continue;
+            }
+            pointcloud->push_back(point);
+        }
+        pointcloud->header = raw_pointcloud.header;
+    }
+}
+
+
+
 bool Loader::loadPointcloudFromROSBag(const std::string& bag_path,
                                       const Scan::Config& scan_config,
                                       Lidar* lidar) {
@@ -94,6 +148,8 @@ bool Loader::loadPointcloudFromROSBag(const std::string& bag_path,
     parsePointcloudMsg(*(m.instantiate<sensor_msgs::PointCloud2>()),
                        &pointcloud);
 
+    //parsePointcloudMsg_ouster(*(m.instantiate<sensor_msgs::PointCloud2>()), &pointcloud);
+
     lidar->addPointcloud(pointcloud, scan_config);
 
     if (lidar->getNumberOfScans() >= config_.use_n_scans) {
@@ -106,7 +162,6 @@ bool Loader::loadPointcloudFromROSBag(const std::string& bag_path,
         "messages of type sensor_msgs/PointCloud2");
     return false;
   }
-
   return true;
 }
 

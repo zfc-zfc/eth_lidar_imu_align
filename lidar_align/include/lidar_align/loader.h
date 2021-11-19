@@ -21,6 +21,9 @@ class Loader {
   void parsePointcloudMsg(const sensor_msgs::PointCloud2 msg,
                           LoaderPointcloud* pointcloud);
 
+  void parsePointcloudMsg_ouster(const sensor_msgs::PointCloud2 msg,
+                              LoaderPointcloud* pointcloud);
+
   bool loadPointcloudFromROSBag(const std::string& bag_path,
                                 const Scan::Config& scan_config, Lidar* lidar);
 
@@ -40,9 +43,25 @@ class Loader {
 
 POINT_CLOUD_REGISTER_POINT_STRUCT(
     lidar_align::PointAllFields,
-    (float, x, x)(float, y, y)(float, z, z)(int32_t, time_offset_us,
-                                            time_offset_us)(
-        uint16_t, reflectivity, reflectivity)(uint16_t, intensity,
-                                              intensity)(uint8_t, ring, ring))
+    (float, x, x)
+    (float, y, y)
+    (float, z, z)
+    (int32_t, time_offset_us,time_offset_us)
+    (uint16_t, reflectivity, reflectivity)
+    (uint16_t, intensity,intensity)
+    (uint8_t, ring, ring)
+    )
+
+POINT_CLOUD_REGISTER_POINT_STRUCT(lidar_align::Ouster_Point,
+                                  (float, x, x)
+                                  (float, y, y)
+                                  (float, z, z)
+                                  (float, intensity, intensity)
+                                  (std::uint32_t, t, t)
+                                  (std::uint16_t, reflectivity, reflectivity)
+                                  (std::uint8_t, ring, ring)
+                                  (std::uint16_t, ambient, ambient)
+                                  (std::uint32_t, range, range)
+)
 
 #endif  // LIDAR_ALIGN_ALIGNER_H_
