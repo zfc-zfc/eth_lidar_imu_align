@@ -1,4 +1,4 @@
-# lidar_align
+# Lidar_imu_align(modified from ETH lidar_imu_align)
 
 ## A simple method for finding the extrinsic calibration between a 3D lidar and a 6-dof pose sensor
 
